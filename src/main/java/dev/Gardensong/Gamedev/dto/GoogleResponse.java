@@ -6,5 +6,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record GoogleResponse(List<Item> items) {
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record Item(String title, String link) {}
+    public record Item(String title, String link, String snippet) {}
 }
+

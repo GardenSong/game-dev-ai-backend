@@ -9,16 +9,15 @@ import java.net.URL;
 import java.nio.file.Path;
 
 public class GamedevPromptLoader {
-    private static final String PROMPT_FILE_PATH = "config/Gamedev_prompt.txt";
 
-    public static String loadPrompt() {
+    public static String loadPrompt(String fileName) {
         try {
-            ClassLoader classLoader = dev.Gardensong.Gamedev.config.GamedevPromptLoader.class.getClassLoader();
-            URL resource = classLoader.getResource(PROMPT_FILE_PATH);
+            ClassLoader classLoader = GamedevPromptLoader.class.getClassLoader();
+            URL resource = classLoader.getResource("config/"+fileName);
 
             if (resource == null) {
-                System.err.println("❌ Gamedev_prompt.txt 파일을 찾을 수 없습니다.");
-                return "Gamedev 기본 프롬프트를 불러올 수 없습니다.";
+                System.err.println("❌" + fileName + "파일을 찾을 수 없습니다.");
+                return "FixBot 프롬프트를 불러올 수 없습니다.";
             }
 
             Path path = Paths.get(resource.toURI());
@@ -26,7 +25,15 @@ public class GamedevPromptLoader {
 
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
-            return "Gamedev 기본 프롬프트를 불러올 수 없습니다.";
+            return "FixBot 프롬프트를 불러올 수 없습니다.";
         }
+    }
+    public static String getFormattedPrompt(String fileName, String role, String userInput) {
+        String template = loadPrompt(fileName);
+
+        return template
+                .replace("${role}", role != null ? role : "알 수 없음")
+                .replace("${userInput}", userInput != null ? userInput : "질문이 제공되지 않았습니다.");
+
     }
 }

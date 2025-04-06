@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.Gardensong.Gamedev.dto.GoogleDTO;
 import dev.Gardensong.Gamedev.dto.GoogleParam;
 import dev.Gardensong.Gamedev.dto.GoogleResponse;
-import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import java.net.URI;
@@ -16,24 +16,21 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Repository
-public class GoogleRepository implements APIClientRepository {
+public class GoogleRepository {
+    @Value("${google.key}")
+    private String API_KEY;
+
+    @Value("${google.cs}")
+    private String CX;
+
     private static final String BASE_URL = "https://www.googleapis.com/customsearch/v1";
     private final HttpClient httpClient = getHttpClient();
     private final ObjectMapper objectMapper = getObjectMapper();
-    private final String API_KEY = getDotenv().get("GOOGLE_KEY"); // 환경 변수에서 API 키 가져오기
-    private final String CX = getDotenv().get("GOOGLE_CX"); // 검색 엔진 ID 가져오기
 
-    @Override
     public HttpClient getHttpClient() {
         return HttpClient.newHttpClient();
     }
 
-    @Override
-    public Dotenv getDotenv() {
-        return Dotenv.configure().ignoreIfMissing().load();
-    }
-
-    @Override
     public ObjectMapper getObjectMapper() {
         return new ObjectMapper();
     }
@@ -66,8 +63,9 @@ public class GoogleRepository implements APIClientRepository {
         return googleResponse.items()
                 .stream()
                 .map(item -> new GoogleDTO(
-                        item.title(), // 검색 결과 제목
-                        item.link()   // 검색 결과 URL
+                        item.title(),
+                        item.link(),
+                        item.snippet() // ✅ 누락된 snippet 추가
                 ))
                 .toList();
     }
